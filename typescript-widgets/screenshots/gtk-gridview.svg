@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f6f5f4"/>
+  <rect x="28" y="28" width="904" height="484" rx="18" fill="#ffffff" stroke="#c0bfbc" stroke-width="3"/>
+  <rect x="28" y="28" width="904" height="72" rx="18" fill="#deddda"/>
+  <circle cx="66" cy="64" r="9" fill="#e01b24"/>
+  <circle cx="94" cy="64" r="9" fill="#f5c211"/>
+  <circle cx="122" cy="64" r="9" fill="#33d17a"/>
+  <text x="480" y="67" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#241f31">Gtk.GridView</text>
+  <rect x="112" y="164" width="736" height="250" rx="14" fill="#f2f1f0" stroke="#9a9996" stroke-width="2"/>
+  <text x="480" y="270" text-anchor="middle" font-family="sans-serif" font-size="42" font-weight="bold" fill="#241f31">Gtk.GridView</text>
+  <text x="480" y="318" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#5e5c64">Schéma GTK4 / Adwaita / Cairo</text>
+  <text x="480" y="370" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#77767b">Aucune capture officielle disponible</text>
+</svg>
