@@ -6,6 +6,7 @@ import { marked } from "marked";
 import { getHeadingList, gfmHeadingId } from "marked-gfm-heading-id";
 
 const rootDirectory = process.cwd();
+const localOnly = process.argv.includes("--local-only");
 const ignoredDirectories = new Set([".git", "node_modules"]);
 const externalUrls = new Map();
 const failures = [];
@@ -127,7 +128,7 @@ async function checkLocalLink(sourceFile, href, anchorCache) {
   }
 }
 
-async function checkExternalUrl(url) {
+async function requestExternalUrl(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20_000);
   try {
@@ -149,13 +150,33 @@ async function checkExternalUrl(url) {
       });
     }
     await response.body?.cancel();
-    return response.ok
-      ? null
-      : `réponse HTTP ${response.status}`;
+    return { ok: response.ok, status: response.status };
   } catch (error) {
-    return error.name === "AbortError" ? "délai dépassé" : error.message;
+    return {
+      error: error.name === "AbortError" ? "délai dépassé" : error.message,
+      ok: false,
+    };
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+async function checkExternalUrl(url) {
+  const attempts = 3;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const result = await requestExternalUrl(url);
+    if (result.ok) {
+      return null;
+    }
+
+    const retryable =
+      result.error ||
+      result.status === 429 ||
+      (result.status >= 500 && result.status <= 599);
+    if (!retryable || attempt === attempts) {
+      return result.error ?? `réponse HTTP ${result.status}`;
+    }
+    await new Promise((done) => setTimeout(done, attempt * 500));
   }
 }
 
@@ -167,10 +188,12 @@ async function main() {
     const markdown = await readFile(sourceFile, "utf8");
     for (const { href } of collectLinks(markdown)) {
       if (/^https?:\/\//i.test(href)) {
-        if (!externalUrls.has(href)) {
-          externalUrls.set(href, []);
+        if (!localOnly) {
+          if (!externalUrls.has(href)) {
+            externalUrls.set(href, []);
+          }
+          externalUrls.get(href).push(displayPath(sourceFile));
         }
-        externalUrls.get(href).push(displayPath(sourceFile));
       } else if (!/^(?:mailto:|data:|javascript:)/i.test(href)) {
         await checkLocalLink(sourceFile, href, anchorCache);
       }
@@ -194,9 +217,10 @@ async function main() {
     });
   }
 
-  console.log(
-    `${markdownFiles.length} fichiers Markdown, ${urls.length} URL externes vérifiées.`,
-  );
+  const externalSummary = localOnly
+    ? "contrôle externe ignoré"
+    : `${urls.length} URL externes vérifiées`;
+  console.log(`${markdownFiles.length} fichiers Markdown, ${externalSummary}.`);
   if (failures.length > 0) {
     for (const failure of failures) {
       console.error(`${failure.file}: ${failure.href} — ${failure.reason}`);

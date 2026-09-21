@@ -5,7 +5,8 @@
   "scripts": {
     "epub": "node scripts/generate-epub.mjs",
     "images:widgets": "node scripts/download-widget-images.mjs",
-    "links:check": "node scripts/check-markdown-links.mjs"
+    "links:check": "node scripts/check-markdown-links.mjs",
+    "links:check:local": "node scripts/check-markdown-links.mjs --local-only"
   },
   "dependencies": {
     "jszip": "^3.10.1",
