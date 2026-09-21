@@ -36,10 +36,10 @@ jobs:
 
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Installer Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -57,7 +57,7 @@ jobs:
         run: test -s livre-node-gtk-typescript.epub
 
       - name: Publier l'artefact du workflow
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: livre-node-gtk-typescript
           path: livre-node-gtk-typescript.epub
@@ -74,7 +74,7 @@ jobs:
 
     steps:
       - name: Télécharger l'EPUB
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: livre-node-gtk-typescript
 
